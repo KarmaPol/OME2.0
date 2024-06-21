@@ -11,11 +11,15 @@ load_dotenv(os.path.join(BASE_DIR, ".env"))
 
 app = FastAPI()
 
-@app.get("/")
-def read_root():
+@app.get("/", status_code=200)
+def health_check():
+    return "healthy"
+
+@app.get("/recommend")
+def get_recommendation():
     location_req = {
-        "longitude": "127.06283102249932",
-        "latitude": "37.514322572335935"
+        "longitude": "126.48913062962178",
+        "latitude": "33.48631119182245"
     }
 
     response = get_kakao_api_response(location_req, 1)
@@ -25,5 +29,6 @@ def read_root():
 def startup_event():
     import os
     app.state.KAKAO_API_KEY = os.getenv("KAKAO_API_KEY")
+    app.state.GEMINI_API_KEY = os.getenv("GEMINI_API_KEY")
 
 handler = Mangum(app)
