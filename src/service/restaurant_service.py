@@ -6,7 +6,7 @@ from dotenv import load_dotenv
 from fastapi import HTTPException
 import requests
 
-from src.genAI_service import generate_content
+from src.service.genAI_service import generate_content
 
 MAX_RESTAURANT_NUM = 15
 load_dotenv()
@@ -29,7 +29,7 @@ def get_restaurant_recommendation(location_req, page):
     }
 
     kakao_result = get_kakao_search_result(headers, params, url)
-    genAI_recommendation = get_genAI_recommendation(kakao_result)
+    genAI_recommendation = get_genAI_recommendation(kakao_result, location_req['theme'])
     recommend_data = get_coverted_json(genAI_recommendation)
 
     return recommend_data
@@ -49,19 +49,15 @@ def get_kakao_search_result(headers, params, url):
         response.raise_for_status()
 
         restaurants = response.json()['documents']
-
-        genai_request = {};
-        genai_request['restaurants'] = restaurants
-        genai_request['theme'] = '한식'
     except requests.RequestException as e:
         raise HTTPException(status_code=500, detail=str(e))
-    return genai_request
+    return restaurants
 
-def get_genAI_recommendation(restaurants):
+def get_genAI_recommendation(restaurants, theme):
     try:
         genai_request = {};
         genai_request['restaurants'] = restaurants
-        genai_request['theme'] = '한식'
+        genai_request['theme'] = theme
 
         response = generate_content(genai_request)
     except requests.RequestException as e:

@@ -4,7 +4,7 @@ from dotenv import load_dotenv
 from fastapi import FastAPI
 from mangum import Mangum
 
-from src.restaurant_service import get_restaurant_recommendation
+from src.service.restaurant_service import get_restaurant_recommendation
 
 BASE_DIR = os.path.dirname(os.path.abspath(__file__))
 load_dotenv(os.path.join(BASE_DIR, ".env"))
@@ -16,10 +16,11 @@ def health_check():
     return "healthy"
 
 @app.get("/recommend")
-def get_recommendation():
+def get_recommendation(longtiude: str="127.06283102249932", latitude: str="37.514322572335935", theme: str="한식"):
     location_req = {
-        "longitude": "126.48913062962178",
-        "latitude": "33.48631119182245"
+        "longitude": longtiude,
+        "latitude": latitude,
+        "theme": theme
     }
 
     response = get_restaurant_recommendation(location_req, 1)
