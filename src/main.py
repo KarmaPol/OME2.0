@@ -4,7 +4,7 @@ from dotenv import load_dotenv
 from fastapi import FastAPI
 from mangum import Mangum
 
-from src.restaurant_service import get_kakao_api_response
+from src.restaurant_service import get_restaurant_recommendation
 
 BASE_DIR = os.path.dirname(os.path.abspath(__file__))
 load_dotenv(os.path.join(BASE_DIR, ".env"))
@@ -22,7 +22,7 @@ def get_recommendation():
         "latitude": "33.48631119182245"
     }
 
-    response = get_kakao_api_response(location_req, 1)
+    response = get_restaurant_recommendation(location_req, 1)
     return response
 
 @app.on_event("startup")
