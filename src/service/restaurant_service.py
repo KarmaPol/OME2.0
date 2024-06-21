@@ -29,15 +29,17 @@ def get_restaurant_recommendation(location_req, page):
     }
 
     kakao_result = get_kakao_search_result(headers, params, url)
-    genAI_recommendation = get_genAI_recommendation(kakao_result, location_req['theme'])
+    genAI_recommendation = get_genAI_recommendation(kakao_result, location_req['theme'], location_req['tag'])
+    print(genAI_recommendation)
     recommend_data = get_coverted_json(genAI_recommendation)
 
     return recommend_data
 
 def get_coverted_json(result):
     try:
-        json_string = re.search(r'```json\n(.*?)\n```', result, re.DOTALL).group(1)
-        quote_replaced_json = json_string.replace("\'", "\"")
+        if result.startswith('```json'):
+            result = re.search(r'```json\n(.*?)\n```', result, re.DOTALL).group(1)
+        quote_replaced_json = result.replace("\'", "\"")
         dicted_json = json.loads(quote_replaced_json)
     except json.JSONDecodeError as e:
         print("JSONDecodeError:", e)
@@ -53,11 +55,12 @@ def get_kakao_search_result(headers, params, url):
         raise HTTPException(status_code=500, detail=str(e))
     return restaurants
 
-def get_genAI_recommendation(restaurants, theme):
+def get_genAI_recommendation(restaurants, theme, tag):
     try:
         genai_request = {};
         genai_request['restaurants'] = restaurants
         genai_request['theme'] = theme
+        genai_request['tag'] = tag
 
         response = generate_content(genai_request)
     except requests.RequestException as e:

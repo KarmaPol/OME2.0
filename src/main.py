@@ -16,11 +16,12 @@ def health_check():
     return "healthy"
 
 @app.get("/recommend")
-def get_recommendation(longtiude: str="127.06283102249932", latitude: str="37.514322572335935", theme: str="한식"):
+def get_recommendation(longitude: str="127.06283102249932", latitude: str="37.514322572335935", theme: str="한식", tag: str=""):
     location_req = {
-        "longitude": longtiude,
+        "longitude": longitude,
         "latitude": latitude,
-        "theme": theme
+        "theme": theme,
+        "tag": tag
     }
 
     response = get_restaurant_recommendation(location_req, 1)
