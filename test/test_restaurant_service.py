@@ -31,9 +31,8 @@ def test_get_restaurant_recommendation(mock_get_genAI_recommendation, mock_get_k
         theme="한식",
         tag=None
     )
-    page = 1
 
-    response = get_restaurant_recommendation(get_recommendation_req, page)
+    response = get_restaurant_recommendation(get_recommendation_req)
     expected_response = Get_recommendation_response(
         title='Mock Restaurant',
         category='Food > Korean',

@@ -14,7 +14,7 @@ from app.service.genAI_service import generate_content
 MAX_RESTAURANT_NUM = 15
 load_dotenv()
 
-def get_restaurant_recommendation(get_recommendation_req, page):
+def get_restaurant_recommendation(get_recommendation_req):
     url = 'https://dapi.kakao.com/v2/local/search/keyword.json'
     kakao_api_key = os.environ['KAKAO_API_KEY']
     headers = {

@@ -1,6 +1,6 @@
 #!/bin/sh
 
-cd ~/PycharmProjects/ome2.0
+#cd ~/PycharmProjects/ome2.0
 
 pytest
 if [ $? -ne 0 ]; then
@@ -11,5 +11,7 @@ else
 fi
 
 pip freeze > requirements.txt
+git add requirements.txt
+git commit -m "chore: update requirements.txt"
 git push
 sam sync --stack-name=ome-restaurant-app
