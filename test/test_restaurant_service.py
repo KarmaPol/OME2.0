@@ -1,3 +1,4 @@
+import os
 from unittest.mock import patch
 
 from app.dto.get_recommendation_request import Get_recommendation_request
@@ -15,6 +16,8 @@ mock_kakao_result = [
 ]
 
 mock_genAI_recommendation = """{'place_name': 'Mock Restaurant', 'category_name': 'Food > Korean', 'place_url': 'http://mock.restaurant', 'distance': '100', 'road_address_name': 'Mock Address'}"""
+
+os.environ['KAKAO_API_KEY'] = 'mock_api_key'
 
 @patch('app.service.restaurant_service.get_kakao_search_result')
 @patch('app.service.restaurant_service.get_genAI_recommendation')
