@@ -5,9 +5,9 @@ from dotenv import load_dotenv
 from fastapi import FastAPI, Query
 from mangum import Mangum
 
-from src.dto.get_recommendation_request import Get_recommendation_request
-from src.dto.get_recommendation_response import Get_recommendation_response
-from src.service.restaurant_service import get_restaurant_recommendation
+from app.dto.get_recommendation_request import Get_recommendation_request
+from app.dto.get_recommendation_response import Get_recommendation_response
+from app.service.restaurant_service import get_restaurant_recommendation
 
 BASE_DIR = os.path.dirname(os.path.abspath(__file__))
 load_dotenv(os.path.join(BASE_DIR, ".env"))

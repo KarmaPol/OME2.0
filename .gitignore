@@ -1,4 +1,4 @@
-/src/.env
+/app/.env
 /.aws-sam/
 /.venv/
 /template.yml

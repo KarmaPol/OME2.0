@@ -6,8 +6,8 @@ from dotenv import load_dotenv
 from fastapi import HTTPException
 import requests
 
-from src.dto.get_recommendation_response import Get_recommendation_response
-from src.service.genAI_service import generate_content
+from app.dto.get_recommendation_response import Get_recommendation_response
+from app.service.genAI_service import generate_content
 
 MAX_RESTAURANT_NUM = 15
 load_dotenv()
