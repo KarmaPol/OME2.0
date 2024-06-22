@@ -1,9 +1,12 @@
 import os
+from typing import Union
 
 from dotenv import load_dotenv
-from fastapi import FastAPI
+from fastapi import FastAPI, Query
 from mangum import Mangum
 
+from src.dto.get_recommendation_request import Get_recommendation_request
+from src.dto.get_recommendation_response import Get_recommendation_response
 from src.service.restaurant_service import get_restaurant_recommendation
 
 BASE_DIR = os.path.dirname(os.path.abspath(__file__))
@@ -16,15 +19,19 @@ def health_check():
     return "healthy"
 
 @app.get("/recommend")
-def get_recommendation(longitude: str="127.06283102249932", latitude: str="37.514322572335935", theme: str="한식", tag: str=""):
-    location_req = {
-        "longitude": longitude,
-        "latitude": latitude,
-        "theme": theme,
-        "tag": tag
-    }
-
-    response = get_restaurant_recommendation(location_req, 1)
+def get_recommendation(
+    longitude: Union[str, None] = Query("127.06283102249932"),
+    latitude: Union[str, None] = Query("37.514322572335935"),
+    theme: Union[str, None] = Query("한식"),
+    tag: Union[str, None] = Query(None)
+) -> Get_recommendation_response:
+    request = Get_recommendation_request(
+        longitude=longitude,
+        latitude=latitude,
+        theme=theme,
+        tag=tag
+    )
+    response = get_restaurant_recommendation(request, 1)
     return response
 
 @app.on_event("startup")

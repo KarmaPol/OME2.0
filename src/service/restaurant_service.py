@@ -6,12 +6,13 @@ from dotenv import load_dotenv
 from fastapi import HTTPException
 import requests
 
+from src.dto.get_recommendation_response import Get_recommendation_response
 from src.service.genAI_service import generate_content
 
 MAX_RESTAURANT_NUM = 15
 load_dotenv()
 
-def get_restaurant_recommendation(location_req, page):
+def get_restaurant_recommendation(get_recommendation_req, page):
     url = 'https://dapi.kakao.com/v2/local/search/keyword.json'
     kakao_api_key = os.environ['KAKAO_API_KEY']
     headers = {
@@ -20,8 +21,8 @@ def get_restaurant_recommendation(location_req, page):
     params = {
         "query": "음식점",
         "category_group_code": "FD6",
-        "x": location_req['longitude'],
-        "y": location_req['latitude'],
+        "x": get_recommendation_req.longitude,
+        "y": get_recommendation_req.latitude,
         "radius": 500,
         "size": MAX_RESTAURANT_NUM,
         "page": page,
@@ -29,11 +30,17 @@ def get_restaurant_recommendation(location_req, page):
     }
 
     kakao_result = get_kakao_search_result(headers, params, url)
-    genAI_recommendation = get_genAI_recommendation(kakao_result, location_req['theme'], location_req['tag'])
+    genAI_recommendation = get_genAI_recommendation(kakao_result, get_recommendation_req.theme, get_recommendation_req.tag)
     print(genAI_recommendation)
     recommend_data = get_coverted_json(genAI_recommendation)
 
-    return recommend_data
+    return Get_recommendation_response(
+        title=recommend_data['place_name'],
+        category=recommend_data['category_name'],
+        link=recommend_data['place_url'],
+        distance=recommend_data['distance'],
+        address=recommend_data['road_address_name']
+    )
 
 def get_coverted_json(result):
     try:
