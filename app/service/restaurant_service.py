@@ -1,6 +1,8 @@
+import itertools
 import json
 import os
 import re
+from concurrent.futures import ThreadPoolExecutor, as_completed
 
 from dotenv import load_dotenv
 from fastapi import HTTPException
@@ -25,13 +27,23 @@ def get_restaurant_recommendation(get_recommendation_req, page):
         "y": get_recommendation_req.latitude,
         "radius": 500,
         "size": MAX_RESTAURANT_NUM,
-        "page": page,
         "sort": "distance"
     }
+    pages = [1, 2, 3, 4]
+    kakao_results = []
 
-    kakao_result = get_kakao_search_result(headers, params, url)
-    genAI_recommendation = get_genAI_recommendation(kakao_result, get_recommendation_req.theme, get_recommendation_req.tag)
-    print(genAI_recommendation)
+    with ThreadPoolExecutor(len(pages)) as executor:
+        futures = {executor.submit(get_kakao_search_result, headers, params, url, page): page for page in pages}
+
+        for future in as_completed(futures):
+            try:
+                kakao_result = future.result()
+                kakao_results.append(kakao_result)
+            except Exception as e:
+                raise HTTPException(status_code=500, detail=str(e))
+
+    flatten_kakao_results = list(itertools.chain(*kakao_results)) # 이중 리스트 평탄화
+    genAI_recommendation = get_genAI_recommendation(flatten_kakao_results, get_recommendation_req.theme, get_recommendation_req.tag)
     recommend_data = get_coverted_json(genAI_recommendation)
 
     return Get_recommendation_response(
@@ -49,11 +61,12 @@ def get_coverted_json(result):
         quote_replaced_json = result.replace("\'", "\"")
         dicted_json = json.loads(quote_replaced_json)
     except json.JSONDecodeError as e:
-        print("JSONDecodeError:", e)
+        raise HTTPException(status_code=500, detail=str(e))
     return dicted_json
 
-def get_kakao_search_result(headers, params, url):
+def get_kakao_search_result(headers, params, url, page):
     try:
+        params['page'] = page
         response = requests.get(url, headers=headers, params=params)
         response.raise_for_status()
 
