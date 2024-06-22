@@ -31,7 +31,7 @@ def get_recommendation(
         theme=theme,
         tag=tag
     )
-    response = get_restaurant_recommendation(request, 1)
+    response = get_restaurant_recommendation(request)
     return response
 
 @app.on_event("startup")

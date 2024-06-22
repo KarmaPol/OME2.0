@@ -11,7 +11,4 @@ else
 fi
 
 pip freeze > requirements.txt
-git add requirements.txt
-git commit -m "chore: update requirements.txt"
-git push
 sam sync --stack-name=ome-restaurant-app
