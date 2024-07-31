@@ -1,6 +1,7 @@
 import os
 from typing import Union
 
+import uvicorn
 from dotenv import load_dotenv
 from fastapi import FastAPI, Query
 from mangum import Mangum
@@ -24,7 +25,7 @@ def get_recommendation(
     latitude: Union[str, None] = Query("37.514322572335935"),
     theme: Union[str, None] = Query("한식"),
     tag: Union[str, None] = Query(None)
-) -> Get_recommendation_response:
+) -> list[Get_recommendation_response]:
     request = Get_recommendation_request(
         longitude=longitude,
         latitude=latitude,
@@ -34,6 +35,7 @@ def get_recommendation(
     response = get_restaurant_recommendation(request)
     return response
 
+
 @app.on_event("startup")
 def startup_event():
     import os
@@ -41,3 +43,6 @@ def startup_event():
     app.state.GEMINI_API_KEY = os.getenv("GEMINI_API_KEY")
 
 handler = Mangum(app)
+
+if __name__ == "__main__":
+    uvicorn.run(app, host="0.0.0.0", port=8000)
