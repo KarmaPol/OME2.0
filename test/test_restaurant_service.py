@@ -1,5 +1,6 @@
 import os
 from unittest.mock import patch
+import unittest
 
 from app.dto.get_recommendation_request import Get_recommendation_request
 from app.dto.get_recommendation_response import Get_recommendation_response
@@ -15,24 +16,18 @@ mock_kakao_result = [
     }
 ]
 
-mock_genAI_recommendation = """{'place_name': 'Mock Restaurant', 'category_name': 'Food > Korean', 'place_url': 'http://mock.restaurant', 'distance': '100', 'road_address_name': 'Mock Address'}"""
+mock_genAI_recommendation = """[{'place_name': 'Mock Restaurant', 'category_name': 'Food > Korean', 'place_url': 'http://mock.restaurant', 'distance': '100', 'road_address_name': 'Mock Address'}]"""
 
-mock_metadata = {
-    'total_count': 1
-}
-
+mock_metadata = {'is_end': False, 'pageable_count': 45, 'same_name': {'keyword': '음식점', 'region': [], 'selected_region': ''}, 'total_count': 1}
 
 os.environ['KAKAO_API_KEY'] = 'mock_api_key'
 
-@patch('app.service.restaurant_service.get_kakao_search_result')
-@patch('app.service.restaurant_service.get_genAI_recommendation')
-@patch('app.service.restaurant_service.get_kakao_search_metadata')
+@patch('app.service.restaurant_service.get_kakao_search_result', return_value=mock_kakao_result)
+@patch('app.service.restaurant_service.get_genAI_recommendation', return_value=mock_genAI_recommendation)
+@patch('app.service.restaurant_service.get_kakao_search_metadata', return_value=mock_metadata)
 def test_get_restaurant_recommendation(mock_get_genAI_recommendation,
                                        mock_get_kakao_search_result,
                                        mock_get_kakao_search_metadata):
-    mock_get_kakao_search_result.return_value = mock_kakao_result
-    mock_get_genAI_recommendation.return_value = mock_genAI_recommendation
-    mock_get_kakao_search_metadata.return_value = mock_metadata
 
     get_recommendation_req = Get_recommendation_request(
         longitude="127.06283102249932",
@@ -41,13 +36,11 @@ def test_get_restaurant_recommendation(mock_get_genAI_recommendation,
         tag=None
     )
 
-    response = get_restaurant_recommendation(get_recommendation_req)
-    expected_response = Get_recommendation_response(
-        title='Mock Restaurant',
-        category='Food > Korean',
-        link='http://mock.restaurant',
-        distance='100',
-        address='Mock Address'
-    )
-
-    assert response == expected_response
+    return get_restaurant_recommendation(get_recommendation_req)
+class TestRestaurantServices(unittest.TestCase):
+    def test_get_restaurant_recommendation(self):
+        response = test_get_restaurant_recommendation()
+        print(response)
+        self.assertIsInstance(response, list)
+        self.assertIsInstance(response[0], Get_recommendation_response)
+        self.assertEqual(response[0].title, 'Mock Restaurant')

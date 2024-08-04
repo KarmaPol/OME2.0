@@ -38,3 +38,11 @@ n
 >.venv/lib/python3.11/site-packages/anyio/_backends/_asyncio.py,1/3/13b2dadc1a304806d1279045cdb6b0d9584b4168
 G
 app/service/__init__.py,9/b/9b3839df051a329f6861c3f369500c5a02569882
+e
+5.venv/lib/python3.11/site-packages/pluggy/_callers.py,7/f/7fa0bb990c19ec6ac5c4dfafff41e24424f4bfb7
+d
+4.venv/lib/python3.11/site-packages/_pytest/python.py,b/9/b9d952745c82e9b73dc79e24c8fca24f8eb95954
+e
+5.venv/lib/python3.11/site-packages/pluggy/_manager.py,9/d/9d9a19087bf822ca49dc04c2994fec2deadac19e
+c
+3.venv/lib/python3.11/site-packages/pluggy/_hooks.py,b/d/bd6152bb501e7bf20c1cf6d7c35e556b4afccda0

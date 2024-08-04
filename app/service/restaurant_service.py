@@ -41,6 +41,8 @@ def get_restaurant_recommendation(get_recommendation_req):
     total_restaurant_num = metadata['total_count']
 
     page_number = total_restaurant_num // MAX_RESTAURANT_NUM
+    if page_number == 0:
+        page_number = 1
     pages = [i for i in range(1, page_number+1)]
 
     with ThreadPoolExecutor(len(pages)) as executor:
