@@ -23,14 +23,12 @@ def health_check():
 def get_recommendation(
     longitude: Union[str, None] = Query("127.06283102249932"),
     latitude: Union[str, None] = Query("37.514322572335935"),
-    theme: Union[str, None] = Query("한식"),
-    tag: Union[str, None] = Query(None)
+    theme: Union[str, None] = Query("일식, 한식, 중식, 카페, 아시아음식, 양식, 술집, 샐러드, 브런치"),
 ) -> list[Get_recommendation_response]:
     request = Get_recommendation_request(
         longitude=longitude,
         latitude=latitude,
         theme=theme,
-        tag=tag
     )
     response = get_restaurant_recommendation(request)
     return response

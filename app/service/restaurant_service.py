@@ -1,8 +1,10 @@
 import itertools
 import json
 import os
+import random
 import re
 from concurrent.futures import ThreadPoolExecutor, as_completed
+
 from dotenv import load_dotenv
 from fastapi import HTTPException
 import requests
@@ -11,7 +13,8 @@ from app.dto.get_recommendation_response import Get_recommendation_response
 from app.service.genAI_service import generate_content
 
 MAX_RESTAURANT_NUM = 15
-THREAD_NUM = 5
+MAX_INPUT_RESTAURANTS_NUM = 100
+THREAD_NUM = 1
 
 load_dotenv()
 
@@ -26,7 +29,7 @@ def get_restaurant_recommendation(get_recommendation_req):
         "category_group_code": "FD6",
         "x": get_recommendation_req.longitude,
         "y": get_recommendation_req.latitude,
-        "radius": 500,
+        "radius": 600,
         "size": MAX_RESTAURANT_NUM,
         "sort": "distance"
     }
@@ -39,9 +42,6 @@ def get_restaurant_recommendation(get_recommendation_req):
     total_restaurant_num = metadata['total_count']
 
     page_number = total_restaurant_num // MAX_RESTAURANT_NUM
-    if page_number > 10:
-        page_number = 10
-
     pages = [i for i in range(2, page_number+1)]
 
     with ThreadPoolExecutor(len(pages)) as executor:
@@ -55,20 +55,22 @@ def get_restaurant_recommendation(get_recommendation_req):
                 raise HTTPException(status_code=500, detail=str(e))
 
     flatten_kakao_results = list(itertools.chain(*kakao_results))
-    # flatten_kakao_results = random.shuffle(flatten_kakao_results)
+    unique_kakao_results = list({frozenset(kakao_result.items()): kakao_result for kakao_result in flatten_kakao_results}.values())
+    random.shuffle(unique_kakao_results)
+    selected_kakao_results = unique_kakao_results[:MAX_INPUT_RESTAURANTS_NUM]
 
     sublists = []
-    sublist_size = len(flatten_kakao_results) // THREAD_NUM
+    sublist_size = len(selected_kakao_results) // THREAD_NUM
     start_index = 0
 
     for i in range(THREAD_NUM-1):
         end_index = start_index + sublist_size
-        sublist = flatten_kakao_results[start_index:end_index]
+        sublist = selected_kakao_results[start_index:end_index]
         if len(sublist) != 0:
             sublists.append(sublist)
         start_index = end_index
 
-    sublists.append(flatten_kakao_results[start_index:])
+    sublists.append(selected_kakao_results[start_index:])
 
     recommendation_responses = []
     with ThreadPoolExecutor(len(sublists)) as executor:
@@ -78,12 +80,11 @@ def get_restaurant_recommendation(get_recommendation_req):
             try:
                 recommend_data = future.result()
                 recommend_data = get_coverted_json(recommend_data)
-                recommendation_response = Get_recommendation_response(title=recommend_data['place_name'],
-                                                       category=recommend_data['category_name'],
-                                                       link=recommend_data['place_url'],
-                                                       distance=recommend_data['distance'],
-                                                       address=recommend_data['road_address_name'])
-                recommendation_responses.append(recommendation_response)
+                for data in recommend_data:
+                    response = Get_recommendation_response(title=data['place_name'], category=data['category_name'],
+                                                           link=data['place_url'], distance=data['distance'],
+                                                           address=data['road_address_name'])
+                    recommendation_responses.append(response)
             except Exception as e:
                 print(e)
                 raise HTTPException(status_code=500, detail=str(e))

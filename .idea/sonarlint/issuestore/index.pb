@@ -30,7 +30,11 @@ c
 app/.env,b/1/b17d0739894748a962de961862627cda63749c57
 ?
 app/__init__.py,6/b/6b5a07a517e9a3845a279675e888c81b77b9d712
-N
-app/service/crawler_service.py,9/8/98247a27c45eda09fc344a0152442e96c0d84d32
 U
 %app/dto/get_recommendation_request.py,7/0/708251519190ee29480c51e093ea74489461bc99
+c
+3.venv/lib/python3.11/site-packages/pydantic/main.py,f/9/f9c7222a68e9f0eb9eddbeb711dc39c77ac73822
+n
+>.venv/lib/python3.11/site-packages/anyio/_backends/_asyncio.py,1/3/13b2dadc1a304806d1279045cdb6b0d9584b4168
+G
+app/service/__init__.py,9/b/9b3839df051a329f6861c3f369500c5a02569882

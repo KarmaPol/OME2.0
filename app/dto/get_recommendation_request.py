@@ -3,7 +3,7 @@ from pydantic import BaseModel
 
 
 class Get_recommendation_request(BaseModel):
-    longitude: Union[str, None] # 테스트 편의성을 위해 None
-    latitude: Union[str, None]
-    theme: Union[str, None]
-    tag: Union[str, None]
+    longitude: Union[str, None] = "127.06283102249932"
+    latitude: Union[str, None] = "37.514322572335935"
+    theme: Union[str, None] = "한식"
+    tag: Union[str, None] = None
