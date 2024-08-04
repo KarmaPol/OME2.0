@@ -29,7 +29,7 @@ def get_restaurant_recommendation(get_recommendation_req):
         "category_group_code": "FD6",
         "x": get_recommendation_req.longitude,
         "y": get_recommendation_req.latitude,
-        "radius": 600,
+        "radius": 500,
         "size": MAX_RESTAURANT_NUM,
         "sort": "distance"
     }
@@ -37,12 +37,11 @@ def get_restaurant_recommendation(get_recommendation_req):
     kakao_results = []
 
     # 전체 페이지 수 확인 후 호출
-    metadata, kakao_result = get_kakao_search_metadata(headers, params, url)
-    kakao_results.append(kakao_result)
+    metadata = get_kakao_search_metadata(headers, params, url)
     total_restaurant_num = metadata['total_count']
 
     page_number = total_restaurant_num // MAX_RESTAURANT_NUM
-    pages = [i for i in range(2, page_number+1)]
+    pages = [i for i in range(1, page_number+1)]
 
     with ThreadPoolExecutor(len(pages)) as executor:
         futures = {executor.submit(get_kakao_search_result, headers, params, url, page): page for page in pages}
@@ -55,7 +54,14 @@ def get_restaurant_recommendation(get_recommendation_req):
                 raise HTTPException(status_code=500, detail=str(e))
 
     flatten_kakao_results = list(itertools.chain(*kakao_results))
-    unique_kakao_results = list({frozenset(kakao_result.items()): kakao_result for kakao_result in flatten_kakao_results}.values())
+    unique_kakao_results = []
+    seen = set()
+    for result in flatten_kakao_results:
+        value_tuple = tuple(result.values())
+        if value_tuple not in seen:
+            seen.add(value_tuple)
+            unique_kakao_results.append(result)
+
     random.shuffle(unique_kakao_results)
     selected_kakao_results = unique_kakao_results[:MAX_INPUT_RESTAURANTS_NUM]
 
@@ -108,10 +114,9 @@ def get_kakao_search_metadata(headers, params, url):
         response.raise_for_status()
 
         metadata = response.json()['meta']
-        restaurants = response.json()['documents']
     except requests.RequestException as e:
         raise HTTPException(status_code=500, detail=str(e))
-    return metadata, restaurants
+    return metadata
 
 def get_kakao_search_result(headers, params, url, page):
     try:
