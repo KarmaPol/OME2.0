@@ -50,5 +50,5 @@ jobs:
         run: |
           python -m pip install --upgrade pip
           pip install -r requirements.txt
-      - run: sam build --use-container
-      - run: sam deploy --no-confirm-changeset --no-fail-on-empty-changeset
+      - run: sam build --use-container --template-file template.yml
+      - run: sam deploy --no-confirm-changeset --no-fail-on-empty-changeset --template-file template.yml
