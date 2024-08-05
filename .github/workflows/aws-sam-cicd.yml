@@ -50,5 +50,4 @@ jobs:
         run: |
           python -m pip install --upgrade pip
           pip install -r requirements.txt
-      - run: sam build --use-container --template-file template.yml
-      - run: sam deploy --no-confirm-changeset --no-fail-on-empty-changeset --template-file template.yml
+      - run: sync --stack-name=ome-restaurant-app
