@@ -35,7 +35,7 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - name: Create template.yml
-        run: echo "${{ secrets.AWS_SAM_TEMPLATE_YAML }}" > template.yml
+        run: echo "${{ secrets.AWS_SAM_TEMPLATE_YAML }}"  > ${{ github.workspace }}/template.yml
       - uses: actions/checkout@v3
       - uses: actions/setup-python@v3
         with:
@@ -51,4 +51,4 @@ jobs:
           python -m pip install --upgrade pip
           pip install -r requirements.txt
       - run: sam build --template-file template.yml
-      - run: sam deploy --no-fail-on-empty-changeset --stack-name ome-restaurant-app --template-file template.yml
+      - run: sam deploy --no-fail-on-empty-changeset --stack-name ome-restaurant-app --template-file ${{ github.workspace }}/template.yml
