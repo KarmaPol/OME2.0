@@ -23,8 +23,8 @@ jobs:
           git config --global user.name KarmaPol
           git config --global user.email kkhkr98@gmail.com
           git add requirements.txt
-          git commit -m 'Chore: Update requirements.txt'
-          git push
+          git commit -m 'Chore: Update requirements.txt' || true
+          git push || true
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
       - name: Install dependencies, run pytest
